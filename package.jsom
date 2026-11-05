@@ -1,0 +1,11 @@
+{
+      "name": "deeeep-proxy",
+        "version": "1.0.0",
+          "scripts": {
+              "start": "node server.js & sleep 3 && cloudflared tunnel --url http://localhost:8080"
+                },
+                  "dependencies": {
+                      "ws": "^8.18.0"
+                        }
+                        }
+
