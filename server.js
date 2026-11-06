@@ -4,7 +4,7 @@ const http = require('http');
 const server = http.createServer(async (req, res) => {
     try {
             // Change the destination hostname to the target game (just like the Worker code)
-                    const targetUrl = 'https://deeeep.io' + req.url;
+                    const targetUrl = 'https://narrow.one/' + req.url;
 
                             const headers = { ...req.headers };
                                     delete headers.host; // Remove host header to prevent tracking flags
