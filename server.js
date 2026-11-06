@@ -1,43 +1,70 @@
 const WebSocket = require('ws');
 const http = require('http');
 
+// ==========================================
+// 🎯 CHANGE THIS TO CLONE A DIFFERENT GAME
+// ==========================================
+const TARGET_GAME = 'narrow.one'; 
+
 const server = http.createServer(async (req, res) => {
     try {
-            // Change the destination hostname to the target game (just like the Worker code)
-                    const targetUrl = 'https://narrow.one/' + req.url;
+            // Automatically builds the links using your variable
+                    let targetUrl = `https://${TARGET_GAME}` + req.url;
+                            let hostHeader = req.headers['host'];
 
-                            const headers = { ...req.headers };
-                                    delete headers.host; // Remove host header to prevent tracking flags
+                                    const headers = { ...req.headers };
+                                            headers['host'] = TARGET_GAME;
+                                                    headers['origin'] = `https://${TARGET_GAME}`;
+                                                            headers['referer'] = `https://${TARGET_GAME}`;
 
-                                            // Fetch the asset from the game server behind the scenes
-                                                    const response = await fetch(targetUrl, {
-                                                                method: req.method,
-                                                                            headers: headers,
-                                                                                        redirect: 'manual'
-                                                                                                });
+                                                                    // Follows redirects behind the scenes
+                                                                            const response = await fetch(targetUrl, {
+                                                                                        method: req.method,
+                                                                                                    headers: headers,
+                                                                                                                redirect: 'follow' 
+                                                                                                                        });
 
-                                                                                                        // Copy the headers from the real game server response over to your iPad
-                                                                                                                res.writeHead(response.status, Object.fromEntries(response.headers.entries()));
-                                                                                                                        
-                                                                                                                                // Stream the asset (HTML, images, JS) back to your school iPad cleanly
-                                                                                                                                        const body = await response.arrayBuffer();
-                                                                                                                                                res.end(Buffer.from(body));
+                                                                                                                                const contentType = response.headers.get('content-type') || '';
+                                                                                                                                        const resHeaders = Object.fromEntries(response.headers.entries());
+                                                                                                                                                delete resHeaders['content-security-policy']; 
+                                                                                                                                                        delete resHeaders['x-frame-options'];
 
-                                                                                                                                                    } catch (err) {
-                                                                                                                                                            res.writeHead(500);
-                                                                                                                                                                    res.end('Proxy asset error: ' + err.message);
-                                                                                                                                                                        }
-                                                                                                                                                                        });
+                                                                                                                                                                // Rewrites hardcoded assets on the fly
+                                                                                                                                                                        if (contentType.includes('text/html') || contentType.includes('application/javascript')) {
+                                                                                                                                                                                    let text = await response.text();
+                                                                                                                                                                                                
+                                                                                                                                                                                                            if (hostHeader) {
+                                                                                                                                                                                                                            // Dynamically swaps the real game link with your unblocked tunnel link
+                                                                                                                                                                                                                                            const targetRegex = new RegExp(TARGET_GAME.replace('.', '\\.'), 'g');
+                                                                                                                                                                                                                                                            text = text.replace(targetRegex, hostHeader);
+                                                                                                                                                                                                                                                                        }
 
-                                                                                                                                                                        // Keep your existing WebSocket proxy intact underneath for live gameplay data
-                                                                                                                                                                        const wss = new WebSocket.Server({ server });
-                                                                                                                                                                        wss.on('connection', (ws) => {
-                                                                                                                                                                            const gameServer = new WebSocket('ws://api.deeeep.io');
-                                                                                                                                                                                ws.on('message', (message) => gameServer.send(message));
-                                                                                                                                                                                    gameServer.on('message', (message) => ws.send(message));
-                                                                                                                                                                                        ws.on('close', () => gameServer.close());
-                                                                                                                                                                                            gameServer.on('close', () => ws.close());
-                                                                                                                                                                                            });
+                                                                                                                                                                                                                                                                                    res.writeHead(response.status, {
+                                                                                                                                                                                                                                                                                                    ...resHeaders,
+                                                                                                                                                                                                                                                                                                                    'content-type': contentType,
+                                                                                                                                                                                                                                                                                                                                    'content-length': Buffer.byteLength(text)
+                                                                                                                                                                                                                                                                                                                                                });
+                                                                                                                                                                                                                                                                                                                                                            return res.end(text);
+                                                                                                                                                                                                                                                                                                                                                                    }
 
-                                                                                                                                                                                            server.listen(8080, () => console.log('Proxy online'));
-                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                            res.writeHead(response.status, resHeaders);
+                                                                                                                                                                                                                                                                                                                                                                                    const body = await response.arrayBuffer();
+                                                                                                                                                                                                                                                                                                                                                                                            res.end(Buffer.from(body));
+
+                                                                                                                                                                                                                                                                                                                                                                                                } catch (err) {
+                                                                                                                                                                                                                                                                                                                                                                                                        res.writeHead(500);
+                                                                                                                                                                                                                                                                                                                                                                                                                res.end('Proxy cloning error: ' + err.message);
+                                                                                                                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                                                                                                    });
+
+                                                                                                                                                                                                                                                                                                                                                                                                                    // WebSocket stream routes game packets cleanly using your variable
+                                                                                                                                                                                                                                                                                                                                                                                                                    const wss = new WebSocket.Server({ server });
+                                                                                                                                                                                                                                                                                                                                                                                                                    wss.on('connection', (ws) => {
+                                                                                                                                                                                                                                                                                                                                                                                                                        const gameServer = new WebSocket(`ws://api.${TARGET_GAME}`);
+                                                                                                                                                                                                                                                                                                                                                                                                                            ws.on('message', (message) => gameServer.send(message));
+                                                                                                                                                                                                                                                                                                                                                                                                                                gameServer.on('message', (message) => ws.send(message));
+                                                                                                                                                                                                                                                                                                                                                                                                                                    ws.on('close', () => gameServer.close());
+                                                                                                                                                                                                                                                                                                                                                                                                                                        gameServer.on('close', () => ws.close());
+                                                                                                                                                                                                                                                                                                                                                                                                                                        });
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                        server.listen(8080, () => console.log(`Proxy active cloning: ${TARGET_GAME}`));
