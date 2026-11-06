@@ -4,7 +4,7 @@ const url = require('url');
 const { WebSocketServer, WebSocket } = require('ws');
 
 const PORT = process.env.PORT || 10000;
-const TARGET_HOST = 'narrow.one'; // Change to 'deeeep.io' if switching games
+const TARGET_HOST = 'Deeeep.io'; // Change to 'deeeep.io' if switching games
 
 const server = http.createServer((req, res) => {
     if (req.url === '/ping') {
