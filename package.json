@@ -1,11 +1,13 @@
 {
-      "name": "deeeep-proxy",
-        "version": "1.0.0",
-          "scripts": {
-              "start": "node server.js & sleep 3 && curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared && chmod +x cloudflared && ./cloudflared tunnel --no-autoupdate run --token eyJhIjoiNDQ0ODgxYjY5YjRmNTA2NmFlYTNkMTk3OTMxMWE3MjciLCJ0IjoiN2U3MTlmOTctMDE1OC00YjBmLTlhYTUtMWE0NTc2ZDNhMGUxIiwicyI6Ik4ySXdaRFE0T1RRdFpEbG1PUzAwTmpRM0xXSmlaRFV0T0dWbE1EWm1aamM0TWpaaSJ9"
-                },
-                  "dependencies": {
-                      "ws": "^8.18.0"
-                        }
-                        }
+    "name": "deeeep-proxy",
+      "version": "1.0.0",
+        "scripts": {
+            "build": "npm install && curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared && chmod +x cloudflared",
+                "start": "PORT=10000 node server.js & sleep 4 && ./cloudflared tunnel --no-autoupdate run --token eyJhIjoiNDQ0ODgxYjY5YjRmNTA2NmFlYTNkMTk3OTMxMWE3MjciLCJ0IjoiN2U3MTlmOTctMDE1OC00YjBmLTlhYTUtMWE0NTc2ZDNhMGUxIiwicyI6Ik4ySXdaRFE0T1RRdFpEbG1PUzAwTmpRM0xXSmlaRFV0T0dWbE1EWm1aamM0TWpaaSJ9"
+                  },
+                    "dependencies": {
+                        "ws": "^8.18.0"
+                          }
+                          }
 
+}
