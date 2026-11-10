@@ -1,0 +1,20 @@
+{
+      "name": "deeeep-proxy",
+        "version": "1.0.0",
+          "description": "Educational proxy pipeline wrapper for dynamic web setups",
+            "main": "server.js",
+              "scripts": {
+                  "start": "node server.js & sleep 5 && curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared && chmod +x cloudflared && ./cloudflared tunnel --no-autoupdate run --token eyJhIjoiNDQ0ODgxYjY5YjRmNTA2NmFlYTNkMTk3OTMxMWE3MjciLCJ0IjoiN2U3MTlmOTctMDE1OC00YjBmLTlhYTUtMWE0NTc2ZDNhMGUxIiwicyI6Ik4ySXdaRFE0T1RRdFpEbG1PUzAwTmpRM0xXSmlaRFV0T0dWbE1EWm1aamM0TWpaaSJ9"
+                    },
+                      "dependencies": {
+                          "@tomphttp/bare-server-node": "^2.0.1",
+                              "express": "^4.21.1",
+                                  "ultraviolet-static": "^3.0.0",
+                                      "ws": "^8.18.0"
+                                        },
+                                          "engines": {
+                                              "node": ">=18.0.0"
+                                                }
+                                                }
+                                                
+}
